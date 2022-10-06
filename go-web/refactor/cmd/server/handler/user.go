@@ -72,14 +72,6 @@ func (u *User) GetId(ctx *gin.Context) {
 func (u *User) CreateUser(ctx *gin.Context) {
 	var request Request
 
-	token := ctx.GetHeader("token")
-	if token != "1234" {
-		ctx.JSON(400, gin.H{
-			"error": "no tiene permisos para realizar la petición solicitada",
-		})
-		return
-	}
-
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		errorArray := strings.Split(string(err.Error()), "'")
 		errorMessage := fmt.Sprintf("El campo %s es requerido", errorArray[3])
