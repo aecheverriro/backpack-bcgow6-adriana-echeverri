@@ -12,7 +12,7 @@ const (
 func registerSale(id string, price float64, quantity int) (err error) {
 	priceFormatted := fmt.Sprintf("%f", price)
 	quantityFormatted := fmt.Sprintf("%d", quantity)
-	content := id + ";" + priceFormatted + ";" + quantityFormatted + "\n"
+	content := id + ";" + priceFormatted + ";" + quantityFormatted
 	f, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0777)
 	if err != nil {
 		return
@@ -31,4 +31,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+if err != nil {
+    panic(err)
 }
