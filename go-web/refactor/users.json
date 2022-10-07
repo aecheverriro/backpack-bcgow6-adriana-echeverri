@@ -42,31 +42,21 @@
   {
     "id": "12345678",
     "name": "Matias",
-    "lastName": "Perez",
+    "lastName": "Martinez",
     "email": "matias.p@icloud.com",
-    "age": 19,
+    "age": 24,
     "height": 1.1,
     "active": false,
     "creationDate": "03-10-2022"
   },
   {
-    "id": "123456789",
-    "name": "Laura",
-    "lastName": "Martinez",
-    "email": "laura.m@meli.com",
-    "age": 41,
-    "height": 1.6,
+    "id": "12345679",
+    "name": "Adriana",
+    "lastName": "Echeverri",
+    "email": "adriana.er98@hotmail.com",
+    "age": 23,
+    "height": 1.7,
     "active": true,
-    "creationDate": "03-10-2022"
-  },
-  {
-    "id": "4",
-    "name": "test",
-    "lastName": "test2",
-    "email": "test3@hotmail.com",
-    "age": 5,
-    "height": 1.2,
-    "active": true,
-    "creationDate": "06-10-2022"
+    "creationDate": "10-07-2022"
   }
 ]

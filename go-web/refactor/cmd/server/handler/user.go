@@ -3,23 +3,21 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/aecheverriro/backpack-bcgow6-adriana-echeverri/go-web/refactor/internal/users"
-	"encoding/json"
-	"os"
-	"io/ioutil"
-	"log"
 	"fmt"
 	"strings"
+	"time"
+	"os"
 )
 
 type Request struct {
-	Id				string  `json:"id"`
-	Name 			string	`json:"name" binding:"required"`
+	Id 				string	`json:"id"`
+	Name 			string	`json:"name"`
 	LastName 		string	`json:"lastName" binding:"required"`
 	Email 			string	`json:"email" binding:"required"`
 	Age 			int		`json:"age" binding:"required"`
 	Height 			float64 `json:"height" binding:"required"`
 	Active 			bool	`json:"active" binding:"required"`
-	CreationDate	bool	`json:"creationDate"`
+	CreationDate 	string	`json:"creationDate"`
 }
 
 type User struct {
@@ -27,7 +25,7 @@ type User struct {
 }
 
 type Users struct {
-	Users []User `json:"users"`
+	Users []User
 }
 
 func NewUser (u users.Service) *User {
@@ -38,15 +36,25 @@ func NewUser (u users.Service) *User {
 
 func (u *User) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		token := ctx.GetHeader("token")
+
+		if token != os.Getenv("TOKEN") {
+			ctx.JSON(401, gin.H {
+				"error:": "token invalido",
+			})
+			return
+		}
 		
 		var userQuery Request
 		err := ctx.ShouldBindQuery(&userQuery)
 
-		allUsers, err := u.service.GetAll(userQuery.Id, userQuery.Name, userQuery.lastName, userQuery.Email, userQuery.Age, userQuery.Height, userQuery.Active, userQuery.CreationDate)
-		
+		fmt.Println(userQuery)
+
+		allUsers, err := u.service.GetAll(userQuery.Id, userQuery.Name, userQuery.LastName, userQuery.Email, userQuery.Age, userQuery.Height, userQuery.Active, userQuery.CreationDate)
+
 		if err != nil {
 			ctx.JSON(404, gin.H {
-				"error:", err.Error()
+				"error:": err.Error(),
 			})
 			return
 		}
@@ -56,12 +64,19 @@ func (u *User) GetAll() gin.HandlerFunc {
 }
 
 func (u *User) GetId(ctx *gin.Context) {
-	
+	token := ctx.GetHeader("token")
+	if token != os.Getenv("TOKEN") {
+		ctx.JSON(401, gin.H {
+			"error:": "token invalido",
+		})
+		return
+	}
+
 	userById, err := u.service.GetId(ctx.Param("id"))
 
 	if err != nil {
 		ctx.JSON(404, gin.H {
-			"error:", err.Error()
+			"error:": err.Error(),
 		})
 		return
 	}
@@ -70,6 +85,14 @@ func (u *User) GetId(ctx *gin.Context) {
 }
 
 func (u *User) CreateUser(ctx *gin.Context) {
+	token := ctx.GetHeader("token")
+	if token != os.Getenv("TOKEN") {
+		ctx.JSON(401, gin.H {
+			"error:": "token invalido",
+		})
+		return
+	}
+	
 	var request Request
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
@@ -81,9 +104,100 @@ func (u *User) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	request.Id = fmt.Sprintf("%v", len(UsersRequest) + 1)
-	request.CreationDate = "04-10-2022"
-	appended := append(UsersRequest, request)
-	fmt.Printf("%v, %v", appended, UsersRequest)
-	ctx.JSON(200, request)
+	id := "4"
+	currentTime := time.Now()
+	creationDate := currentTime.Format("01-02-2006")
+	newUser, err := u.service.CreateUser(id, request.Name, request.LastName, request.Email, request.Age, request.Height, request.Active, creationDate)
+
+	if err != nil {
+		ctx.JSON(404, gin.H {
+			"error:": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(200, newUser)
+	return
+}
+
+func (u *User) UpdateUser(ctx *gin.Context) {
+	token := ctx.GetHeader("token")
+	if token != os.Getenv("TOKEN") {
+		ctx.JSON(401, gin.H {
+			"error:": "token invalido",
+		})
+		return
+	}
+	
+	var request Request
+
+	if err := ctx.ShouldBindJSON(&request); err != nil {
+		ctx.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	request.Id = ctx.Param("id")
+	updatedUser, err := u.service.UpdateUser(request.Id, request.Name, request.LastName, request.Email, request.Age, request.Height, request.Active)
+
+	if err != nil {
+		ctx.JSON(400, err.Error())
+		return
+	}
+	ctx.JSON(200, updatedUser)
+	return
+}
+
+func (u *User) PatchUser(ctx *gin.Context) {
+	token := ctx.GetHeader("token")
+	if token != os.Getenv("TOKEN") {
+		ctx.JSON(401, gin.H {
+			"error:": "token invalido",
+		})
+		return
+	}
+
+	var request Request
+
+	ctx.ShouldBindJSON(&request)
+
+	if request.LastName == "" || request.Age == 0 {
+		errorMessage := "El campo edad y apellido es requerido"
+		ctx.JSON(400, gin.H{
+			"error": errorMessage,
+		})
+		return
+	}
+
+	request.Id = ctx.Param("id")
+	patchedUser, err := u.service.PatchUser(request.Id, request.LastName, request.Age)
+
+	if err != nil {
+		ctx.JSON(400, err.Error())
+		return
+	}
+	ctx.JSON(200, patchedUser)
+	return
+}
+
+func (u *User) DeleteUser(ctx *gin.Context) {
+	token := ctx.GetHeader("token")
+	if token != os.Getenv("TOKEN") {
+		ctx.JSON(401, gin.H {
+			"error:": "token invalido",
+		})
+		return
+	}
+	
+	message, err := u.service.DeleteUser(ctx.Param("id"))
+
+	if err != nil {
+		ctx.JSON(404, gin.H {
+			"error:": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(200, message)
+	return
 }

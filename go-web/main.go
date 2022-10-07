@@ -188,7 +188,7 @@ func PatchUser(ctx *gin.Context) {
 
 	var request Request
 
-	ctx.Bind(&request)
+	ctx.ShouldBindJSON(&request)
 
 	if request.LastName == "" || request.Age == 0 {
 		errorMessage := "El campo edad y apellido es requerido"
