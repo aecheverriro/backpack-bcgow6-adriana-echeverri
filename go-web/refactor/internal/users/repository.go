@@ -1,10 +1,8 @@
 package users
 
 import (
-	"os"
+	"github.com/aecheverriro/backpack-bcgow6-adriana-echeverri/go-web/refactor/pkg/store"
 	"fmt"
-	"io/ioutil"
-	"encoding/json"
 	"errors"
 	"strconv"
 )
@@ -20,10 +18,6 @@ type User struct {
 	CreationDate 	string	`json:"creationDate"`
 }
 
-const (
-	pathToJson = "./users.json" // CHANGE TO JSON LOCATION
-)
-
 type Repository interface {
 	GetAll(string, string, string, string, int, float64, bool, string) ([]User, error)
 	GetId(string) (User, error)
@@ -34,23 +28,25 @@ type Repository interface {
 	LastId() (string, error)
 }
 
-type repository struct {}
+type repository struct {
+	db store.Store
+}
 
-func NewRepository() Repository {
-	return &repository{}
+func NewRepository(db store.Store) Repository {
+	return &repository{
+		db: db,
+	}
 }
 
 func (r *repository) GetAll(id string, name string, lastName string, email string, age int, height float64, active bool, creation string) ([]User, error) {
 
 	var allUsers []User
 	var filteredUsers []User
-	var usersByte []byte
-	jsonFile, _ := os.Open(pathToJson)
-	usersByte, _ = ioutil.ReadAll(jsonFile)
-	
-	if err := json.Unmarshal(usersByte, &allUsers); err != nil {
+
+	if err := r.db.ReadUser(&allUsers); err != nil {
 		return nil, err
 	}
+	fmt.Println(allUsers)
 
 	for _, user := range allUsers {
 		if id != "" && id == user.Id {
@@ -68,7 +64,6 @@ func (r *repository) GetAll(id string, name string, lastName string, email strin
 		// } else if active == user.Active {
 		// 	filteredUsers = append(filteredUsers, user)
 		} else if creation != "" && creation == user.CreationDate {
-			fmt.Println("Entro!")
 			filteredUsers = append(filteredUsers, user)
 		}
 	}
@@ -82,11 +77,8 @@ func (r *repository) GetAll(id string, name string, lastName string, email strin
 
 func (r *repository) GetId(id string) (User, error) {
 	var allUsers []User
-	var usersByte []byte
-	jsonFile, _ := os.Open(pathToJson)
-	usersByte, _ = ioutil.ReadAll(jsonFile)
 
-	if err := json.Unmarshal(usersByte, &allUsers); err != nil {
+	if err := r.db.ReadUser(&allUsers); err != nil {
 		return User{}, err
 	}
 
@@ -100,25 +92,15 @@ func (r *repository) GetId(id string) (User, error) {
 
 func (r *repository) CreateUser(id string, name string, lastName string, email string, age int, height float64, active bool, creationDate string) (User, error) {
 	var allUsers []User
-	var usersByte []byte
-	jsonFile, _ := os.Open(pathToJson)
-	usersByte, _ = ioutil.ReadAll(jsonFile)
 
-	if err := json.Unmarshal(usersByte, &allUsers); err != nil {
+	if err := r.db.ReadUser(&allUsers); err != nil {
 		return User{}, err
 	}
 
 	newUser := User{id, name, lastName, email, age, height, active, creationDate}
-
 	allUsers = append(allUsers, newUser)
 
-	usersJSON, err := json.MarshalIndent(allUsers, "", "  ")
-	if err != nil {
-		return User{}, err
-	}
-
-	err = os.WriteFile(pathToJson, usersJSON, 0644)
-	if err != nil {
+	if err := r.db.WriteUser(allUsers); err != nil {
 		return User{}, err
 	}
 
@@ -127,27 +109,19 @@ func (r *repository) CreateUser(id string, name string, lastName string, email s
 
 func (r *repository) UpdateUser(id string, name string, lastName string, email string, age int, height float64, active bool) (User, error) {
 	var allUsers []User
-	var usersByte []byte
-	jsonFile, _ := os.Open(pathToJson)
-	usersByte, _ = ioutil.ReadAll(jsonFile)
-
-	if err := json.Unmarshal(usersByte, &allUsers); err != nil {
+	updatedUser := User{id, name, lastName, email, age, height, active, ""}
+	
+	if err := r.db.ReadUser(&allUsers); err != nil {
 		return User{}, err
 	}
 
-	updatedUser := User{id, name, lastName, email, age, height, active, ""}
 
 	for index, user := range allUsers {
 		if user.Id == updatedUser.Id {
 			updatedUser.CreationDate = user.CreationDate
 			allUsers[index] = updatedUser
-			usersJSON, err := json.MarshalIndent(allUsers, "", "  ")
-			if err != nil {
-				return User{}, err
-			}
 
-			err = os.WriteFile(pathToJson, usersJSON, 0644)
-			if err != nil {
+			if err := r.db.WriteUser(allUsers); err != nil {
 				return User{}, err
 			}
 			return updatedUser, nil
@@ -159,17 +133,13 @@ func (r *repository) UpdateUser(id string, name string, lastName string, email s
 
 func (r *repository) DeleteUser(id string) (string, error) {
 	var allUsers []User
-	var usersByte []byte
-	jsonFile, _ := os.Open(pathToJson)
-	usersByte, _ = ioutil.ReadAll(jsonFile)
-
-	if err := json.Unmarshal(usersByte, &allUsers); err != nil {
-		return "", err
-	}
-	
 	deleted := false
 	var index int
 
+	if err := r.db.ReadUser(&allUsers); err != nil {
+		return "", err
+	}
+	
 	for i, user := range allUsers {
 		if user.Id == id {
 			deleted = true
@@ -182,13 +152,7 @@ func (r *repository) DeleteUser(id string) (string, error) {
 	}
 
 	allUsers = append(allUsers[:index], allUsers[index+1:]...)
-	usersJSON, err := json.MarshalIndent(allUsers, "", "  ")
-	if err != nil {
-		return "", err
-	}
-
-	err = os.WriteFile(pathToJson, usersJSON, 0644)
-	if err != nil {
+	if err := r.db.WriteUser(allUsers); err != nil {
 		return "", err
 	}
 	return fmt.Sprintf("El usuario %v ha sido eliminado", id), nil
@@ -196,12 +160,9 @@ func (r *repository) DeleteUser(id string) (string, error) {
 
 func (r *repository) PatchUser(id string, lastName string, age int) (User, error) {
 	var allUsers []User
-	var usersByte []byte
 	var updatedUser User
-	jsonFile, _ := os.Open(pathToJson)
-	usersByte, _ = ioutil.ReadAll(jsonFile)
 
-	if err := json.Unmarshal(usersByte, &allUsers); err != nil {
+	if err := r.db.ReadUser(&allUsers); err != nil {
 		return User{}, err
 	}
 
@@ -217,13 +178,7 @@ func (r *repository) PatchUser(id string, lastName string, age int) (User, error
 			updatedUser.CreationDate = user.CreationDate
 			allUsers[index] = updatedUser
 
-			usersJSON, err := json.MarshalIndent(allUsers, "", "  ")
-			if err != nil {
-				return User{}, err
-			}
-
-			err = os.WriteFile(pathToJson, usersJSON, 0644)
-			if err != nil {
+			if err := r.db.WriteUser(allUsers); err != nil {
 				return User{}, err
 			}
 			return updatedUser, nil
@@ -235,12 +190,9 @@ func (r *repository) PatchUser(id string, lastName string, age int) (User, error
 
 func (r *repository) LastId() (string, error) {
 	var allUsers []User
-	var usersByte []byte
-	jsonFile, _ := os.Open(pathToJson)
-	usersByte, _ = ioutil.ReadAll(jsonFile)
 	maxId := 0
 
-	if err := json.Unmarshal(usersByte, &allUsers); err != nil {
+	if err := r.db.ReadUser(&allUsers); err != nil {
 		return "", err
 	}
 
