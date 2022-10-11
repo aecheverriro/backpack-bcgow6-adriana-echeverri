@@ -35,6 +35,16 @@ func NewUser (u users.Service) *User {
 	}
 }
 
+// List Users godoc
+// @Summary      Show all users
+// @Description  get all users
+// @Tags         Users
+// @Produce      json
+// @Param    token  header    int           true  "token"
+// @Success  200    {object}  web.Response  "List users"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not found products"
+// @Router   /users [GET]
 func (u *User) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("token")
@@ -60,6 +70,17 @@ func (u *User) GetAll() gin.HandlerFunc {
 	}
 }
 
+// List User godoc
+// @Summary      Show user of specified id
+// @Description  get user by its id
+// @Tags         Users
+// @Produce      json
+// @Param    id       path    string        true   "ID user"
+// @Param    token  header    int           true  "token"
+// @Success  200    {object}  web.Response  "user"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  404    {object}  web.Response  "Not found products"
+// @Router   /users/{id}      [GET]
 func (u *User) GetId(ctx *gin.Context) {
 	token := ctx.GetHeader("token")
 	if token != os.Getenv("TOKEN") {
@@ -77,6 +98,17 @@ func (u *User) GetId(ctx *gin.Context) {
 	return
 }
 
+// Store User godoc
+// @Summary  Store user
+// @Tags     Users
+// @Accept   json
+// @Produce  json
+// @Param    token    header    int             true  "token requerido"
+// @Param    user	  body      Request		true  "User to Store"
+// @Success  200      {object}  web.Response
+// @Failure  401      {object}  web.Response
+// @Failure  400      {object}  web.Response
+// @Router   /users   [POST]
 func (u *User) CreateUser(ctx *gin.Context) {
 	token := ctx.GetHeader("token")
 	if token != os.Getenv("TOKEN") {
@@ -107,6 +139,19 @@ func (u *User) CreateUser(ctx *gin.Context) {
 	return
 }
 
+// Update User godoc
+// @Summary  Update user
+// @Tags     Users
+// @Accept   json
+// @Produce  json
+// @Param    id       path      string          true   "Id user"
+// @Param    token    header    int             false  "Token"
+// @Param    user     body      Request         true   "User to update"
+// @Success  200      {object}  web.Response
+// @Failure  401      {object}  web.Response
+// @Failure  400      {object}  web.Response
+// @Failure  404      {object}  web.Response
+// @Router   /users/{id} [PUT]
 func (u *User) UpdateUser(ctx *gin.Context) {
 	token := ctx.GetHeader("token")
 	if token != os.Getenv("TOKEN") {
@@ -125,13 +170,27 @@ func (u *User) UpdateUser(ctx *gin.Context) {
 	updatedUser, err := u.service.UpdateUser(request.Id, request.Name, request.LastName, request.Email, request.Age, request.Height, request.Active)
 
 	if err != nil {
-		ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
+		ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
 		return
 	}
 	ctx.JSON(200, web.NewResponse(200, updatedUser, ""))
 	return
 }
 
+// Update Lastname and Age godoc
+// @Summary      Update last name and age of user
+// @Tags         Users
+// @Accept       json
+// @Produce      json
+// @Description  This endpoint update field last name and age from an user
+// @Param        token  header    int               true  "Token header"
+// @Param        id     path      string            true  "User ID"
+// @Param        name   body      Request           true  "User last name and age"
+// @Success      200    {object}  web.Response
+// @Failure      401    {object}  web.Response
+// @Failure      400    {object}  web.Response
+// @Failure      404    {object}  web.Response
+// @Router       /users/{id} [PATCH]
 func (u *User) PatchUser(ctx *gin.Context) {
 	token := ctx.GetHeader("token")
 	if token != os.Getenv("TOKEN") {
@@ -153,13 +212,22 @@ func (u *User) PatchUser(ctx *gin.Context) {
 	patchedUser, err := u.service.PatchUser(request.Id, request.LastName, request.Age)
 	
 	if err != nil {
-		ctx.JSON(400, web.NewResponse(400, nil, err.Error()))
+		ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
 		return
 	}
 	ctx.JSON(200, web.NewResponse(200, patchedUser, ""))
 	return
 }
 
+// Delete User godoc
+// @Summary  Delete user
+// @Tags     Users
+// @Param    id     path      string  true  "Product id"
+// @Param    token  header    int     true  "Token"
+// @Success  204
+// @Failure  401    {object}  web.Response
+// @Failure  404    {object}  web.Response
+// @Router   /users/{id} [DELETE]
 func (u *User) DeleteUser(ctx *gin.Context) {
 	token := ctx.GetHeader("token")
 	if token != os.Getenv("TOKEN") {
@@ -173,6 +241,6 @@ func (u *User) DeleteUser(ctx *gin.Context) {
 		ctx.JSON(404, web.NewResponse(404, nil, err.Error()))
 		return
 	}
-	ctx.JSON(200, web.NewResponse(200, message, ""))
+	ctx.JSON(204, web.NewResponse(204, message, ""))
 	return
 }
