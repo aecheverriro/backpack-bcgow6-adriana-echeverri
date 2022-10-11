@@ -5,29 +5,31 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
-	"desafio-go-web/internal/domain"
+	"github.com/aecheverriro/backpack-bcgow6-adriana-echeverri/go-web/desafio-goweb-adrianaecheverri/internal/domain"
+	"github.com/aecheverriro/backpack-bcgow6-adriana-echeverri/go-web/desafio-goweb-adrianaecheverri/internal/tickets"
+	"github.com/aecheverriro/backpack-bcgow6-adriana-echeverri/go-web/desafio-goweb-adrianaecheverri/cmd/server/handler"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
 	// Cargo csv.
-	list, err := LoadTicketsFromFile("../../tickets.csv")
+	list, err := LoadTicketsFromFile("./tickets.csv")
 	if err != nil {
 		panic("Couldn't load tickets")
 	}
 
+	repo := tickets.NewRepository(list)
+	service := tickets.NewService(repo)
+	p := handler.NewService(service)
+
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) { c.String(200, "pong") })
-	// Rutas a desarollar:
-	
-	// GET - “/ticket/getByCountry/:dest”
-	// GET - “/ticket/getAverage/:dest”
+	r.GET("/ticket/getAverage/:dest", p.AverageDestination())
+	r.GET("/ticket/getByCountry/:dest", p.GetTicketsByCountry())
 	if err := r.Run(); err != nil {
 		panic(err)
 	}
-
 }
 
 func LoadTicketsFromFile(path string) ([]domain.Ticket, error) {
