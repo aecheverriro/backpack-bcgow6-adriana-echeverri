@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1234",
+    "name": "Adriana",
+    "lastName": "Echeverri",
+    "email": "adriana.er98@hotmail.com",
+    "age": 23,
+    "height": 1.7,
+    "active": true,
+    "creationDate": "03-10-2022"
+  },
+  {
+    "id": "12345",
+    "name": "Jhon",
+    "lastName": "Ramirez",
+    "email": "jhon.r@meli.com",
+    "age": 51,
+    "height": 1.9,
+    "active": true,
+    "creationDate": "03-10-2022"
+  },
+  {
+    "id": "123456",
+    "name": "Luis",
+    "lastName": "Ramirez",
+    "email": "luis.r@gmail.com",
+    "age": 33,
+    "height": 1.8,
+    "active": false,
+    "creationDate": "03-10-2022"
+  },
+  {
+    "id": "1234567",
+    "name": "Juan",
+    "lastName": "Rodriguez",
+    "email": "juan.r@hotmail.com",
+    "age": 40,
+    "height": 1.5,
+    "active": true,
+    "creationDate": "03-10-2022"
+  },
+  {
+    "id": "12345678",
+    "name": "Matias",
+    "lastName": "Martinez",
+    "email": "matias.p@icloud.com",
+    "age": 24,
+    "height": 1.1,
+    "active": false,
+    "creationDate": "03-10-2022"
+  },
+  {
+    "id": "12345679",
+    "name": "Adriana",
+    "lastName": "Echeverri",
+    "email": "adriana.er98@hotmail.com",
+    "age": 23,
+    "height": 1.7,
+    "active": true,
+    "creationDate": "10-07-2022"
+  }
+]
