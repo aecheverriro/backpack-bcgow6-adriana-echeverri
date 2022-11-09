@@ -1,0 +1,17 @@
+¿A qué se denomina JOIN en una base de datos y para qué se utiliza?
+JOIN es utilizada para unir tablas que se encuentran relacionadas por uno o varios atributos. 
+
+Explicar dos tipos de JOIN.
+Left JOIN: Es una union donde se tiene todo lo de la tabla de la izquierda y lo que se relaciona con lo de la derecha.
+Right JOIN:  Es una union donde se tiene todo lo de la tabla de la izquierda y lo que se relaciona con lo de la derecha.
+
+¿Para qué se utiliza el GROUP BY?
+El group by reduce el numero de registros al agrupar atributos de igual valor. 
+
+¿Para qué se utiliza el HAVING? 
+El having es un condicional para registros que se encuentren agrupados
+
+Escribir una consulta genérica para cada uno de los siguientes diagramas:
+SELECT movie.*, actors.first_name, actors.last_name FROM movies INNER JOIN actors ON movies.id = actors.favorite_movie_id;
+SELECT * FROM movies mo LEFT JOIN actors ac ON mo.id = ac.favorite_movie_id;
+

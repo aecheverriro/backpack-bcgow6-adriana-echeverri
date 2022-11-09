@@ -1,0 +1,58 @@
+#   Nombre                  Tipo
+1   id_factura              int(11)
+2   fecha_factura           date
+3   forma_pago              decimal(10,0)
+4   IVA                     decimal(10,0)
+5   cantidad                int(11)
+6   importe                 decimal(10,0)
+7   nombre_cliente          varchar(40)
+8   apellido_cliente        varchar(40)
+9   direccion_cliente       varchar(40)
+10  descripcion_articulo    varchar(40)
+
+
+1FN: Eliminan datos duplicados en atributos y se crean registros independientes.
+No hay datos duplicados ya que la tabla no cuenta con registros.
+
+2FN: Dependencias parciales se deben eliminar y separar.
+Tabla cliente
+#   Nombre                  Tipo
+1   nombre_cliente          varchar(40)
+2   apellido_cliente        varchar(40)
+3   direccion_cliente       varchar(40)
+
+Tabla factura
+#   Nombre                  Tipo
+1   id_factura              int(11)
+2   fecha_factura           date
+3   IVA                     decimal(10,0)
+4   importe                 decimal(10,0)
+
+Tabla transaccion
+#   Nombre                  Tipo
+1   forma_pago              decimal(10,0)
+2   cantidad                int(11)
+3   descripcion_articulo    varchar(40)
+
+3FN: Elimina subgrupos de datos en múltiples columnas de una tabla y crea tablas nuevas, con relaciones entre ellas.
+Tabla cliente
+#   Nombre                  Tipo
+1   id_cliente              int(11)
+1   nombre_cliente          varchar(40)
+2   apellido_cliente        varchar(40)
+3   direccion_cliente       varchar(40)
+
+Tabla factura
+#   Nombre                  Tipo
+1   id_factura              int(11)
+2   fecha_factura           date
+3   IVA                     decimal(10,0)
+4   importe                 decimal(10,0)
+
+Tabla transaccion
+#   Nombre                  Tipo
+1   forma_pago              decimal(10,0)
+2   cantidad                int(11)
+3   descripcion_articulo    varchar(40)
+5   id_cliente              int(11)
+6   id_factura              int(11)

@@ -1,0 +1,10 @@
+a. ¿Cuál es la primary key para la tabla de clientes? Justificar respuesta
+ID del cliente
+
+b. ¿Cuál es la primary key para la tabla de planes de internet? Justificar respuesta.
+ID del servicio
+
+c. ¿Cómo serían las relaciones entre tablas? ¿En qué tabla debería haber foreign key? 
+¿A qué campo de qué tabla hace referencia dicha foreign key? Justificar respuesta.
+La relación sería que un cliente tiene muchos servicios (1 a n). En la tabla de servicios 
+debe haber una foreign key relacionada al ID del cliente.

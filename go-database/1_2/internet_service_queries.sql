@@ -1,0 +1,10 @@
+SELECT * FROM clientes;
+SELECT * FROM plan_internet;
+SELECT nombre, apellido FROM clientes;
+SELECT velocidad, precio FROM plan_internet;
+SELECT precio FROM plan_internet WHERE velocidad > 50;
+SELECT nombre, apellido FROM clientes WHERE fecha_nacimiento BETWEEN "1950-01-01" AND "2002-12-12";
+SELECT id_plan FROM plan_internet ORDER BY precio DESC LIMIT 5;
+SELECT id_plan, precio FROM plan_internet WHERE descuento != 0;
+SELECT id_cliente, nombre, apellido FROM clientes WHERE ciudad LIKE "%Bogota";
+SELECT id_cliente, nombre, apellido FROM clientes WHERE fecha_creacion > "2010-12-12";
